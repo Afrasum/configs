@@ -31,7 +31,6 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
-
 -- Custom mapping
 --
 --
@@ -47,13 +46,21 @@ keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 local opts = { noremap = true, silent = true }
 
 -- Normalmodus
-keymap.set("n", "d", '"_d', opts)  -- d som vanlig delete-operator, men uten yanking
-keymap.set("n", "c", '"_c', opts)  -- c som vanlig change-operator, men uten yanking
-keymap.set("n", "s", '"_s', opts)  -- s (substitute) uten yanking
-keymap.set("n", "x", '"_x', opts)  -- x (delete char) uten yanking
+keymap.set("n", "d", '"_d', opts) -- d som vanlig delete-operator, men uten yanking
+keymap.set("n", "c", '"_c', opts) -- c som vanlig change-operator, men uten yanking
+keymap.set("n", "s", '"_s', opts) -- s (substitute) uten yanking
+keymap.set("n", "x", '"_x', opts) -- x (delete char) uten yanking
 
 -- Visuell modus
 keymap.set("v", "d", '"_d', opts)
 keymap.set("v", "c", '"_c', opts)
 keymap.set("v", "s", '"_s', opts)
 keymap.set("v", "x", '"_x', opts)
+
+-- Insertmodus
+keymap.set(
+	"i",
+	"<A-BS>",
+	"<C-w>",
+	{ noremap = true, silent = true, desc = "Delete word before cursor (Alt + Backspace)" }
+)
