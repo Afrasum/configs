@@ -39,6 +39,8 @@ alias ls='eza -1 --icons=always'
 eval "$(zoxide init zsh)"
 alias cd="z"
 
+alias c="claude"
+
 # ---- pyenv ----
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
