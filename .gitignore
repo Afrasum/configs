@@ -1,5 +1,6 @@
 # macOS files
 .DS_Store
+DS_Store
 
 # Backup and swap files
 *~
@@ -34,4 +35,6 @@ nvim/session.vim
 
 # Ignore any other cache directories
 cache/
+raycast/config.json
+
 raycast/config.json
