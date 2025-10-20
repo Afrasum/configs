@@ -34,3 +34,4 @@ nvim/session.vim
 
 # Ignore any other cache directories
 cache/
+raycast/config.json
