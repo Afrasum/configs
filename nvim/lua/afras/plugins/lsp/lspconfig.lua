@@ -22,12 +22,56 @@ return {
 		local keymap = vim.keymap
 
 		---------------------------------------------------------------------------
+		-- Hjelpefunksjon: Restart LSP uten Copilot
+		---------------------------------------------------------------------------
+		local function restart_lsp_safe()
+			local clients = vim.lsp.get_clients({ bufnr = 0 })
+			local excluded_patterns = { "copilot", "GitHub Copilot" }
+			local restarted = false
+
+			for _, client in ipairs(clients) do
+				local should_exclude = false
+				for _, pattern in ipairs(excluded_patterns) do
+					if client.name:lower():find(pattern:lower()) then
+						should_exclude = true
+						break
+					end
+				end
+
+				if not should_exclude then
+					local client_id = client.id
+					vim.lsp.stop_client(client_id, true)
+					vim.defer_fn(function()
+						vim.cmd("edit")
+					end, 100)
+					restarted = true
+				end
+			end
+
+			if restarted then
+				print("LSP restarted (excluding Copilot)")
+			else
+				print("No LSP servers to restart")
+			end
+		end
+
+		vim.api.nvim_create_user_command("LspRestartSafe", restart_lsp_safe, {
+			desc = "Restart LSP servers except Copilot",
+		})
+
+		---------------------------------------------------------------------------
 		-- Buffer-lokale tastatursnarveier for LSP
 		---------------------------------------------------------------------------
 		vim.api.nvim_create_autocmd("LspAttach", {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
 				local opts = { buffer = ev.buf, silent = true }
+
+				-- Enable inlay hints if supported (for type hints in Go, Rust, etc.)
+				local client = vim.lsp.get_client_by_id(ev.data.client_id)
+				if client and client.server_capabilities.inlayHintProvider then
+					vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+				end
 
 				opts.desc = "Vis referanser"
 				keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
@@ -66,7 +110,7 @@ return {
 				keymap.set("n", "K", vim.lsp.buf.hover, opts)
 
 				opts.desc = "Restart LSP"
-				keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
+				keymap.set("n", "<leader>rs", ":LspRestartSafe<CR>", opts)
 			end,
 		})
 
@@ -141,6 +185,101 @@ return {
 							"svelte",
 						},
 					})
+				end,
+
+				["pyright"] = function()
+					-- Finn Python path først
+					local function get_python_path(workspace)
+						-- 1. Check if virtualenv is activated
+						if vim.env.VIRTUAL_ENV then
+							return vim.env.VIRTUAL_ENV .. "/bin/python"
+						end
+
+						-- 2. Check for .venv in workspace
+						if vim.fn.executable(workspace .. "/.venv/bin/python") == 1 then
+							return workspace .. "/.venv/bin/python"
+						end
+
+						-- 3. Check for venv in workspace
+						if vim.fn.executable(workspace .. "/venv/bin/python") == 1 then
+							return workspace .. "/venv/bin/python"
+						end
+
+						return nil
+					end
+
+					lspconfig.pyright.setup({
+						capabilities = capabilities,
+						on_new_config = function(new_config, new_root_dir)
+							local python_path = get_python_path(new_root_dir)
+							if python_path then
+								new_config.settings.python.pythonPath = python_path
+							end
+						end,
+						settings = {
+							python = {
+								analysis = {
+									autoSearchPaths = true,
+									useLibraryCodeForTypes = true,
+									diagnosticMode = "workspace",
+								},
+							},
+							-- Disable organize imports since Ruff handles it
+							pyright = {
+								disableOrganizeImports = true,
+							},
+						},
+					})
+				end,
+
+				["clangd"] = function()
+					lspconfig.clangd.setup({
+						capabilities = capabilities,
+						cmd = {
+							"clangd",
+							"--background-index",
+							"--clang-tidy",
+							"--header-insertion=iwyu",
+							"--completion-style=detailed",
+							"--function-arg-placeholders",
+							"--fallback-style=llvm",
+						},
+						init_options = {
+							usePlaceholders = true,
+							completeUnimported = true,
+							clangdFileStatus = true,
+						},
+					})
+				end,
+
+				["gopls"] = function()
+					return {
+						capabilities = capabilities,
+						settings = {
+							gopls = {
+								analyses = {
+									unusedparams = true,
+									shadow = true,
+									nilness = true,
+									unusedwrite = true,
+									useany = true,
+								},
+								staticcheck = true,
+								gofumpt = true,
+								usePlaceholders = true,
+								completeUnimported = true,
+								hints = {
+									assignVariableTypes = true,
+									compositeLiteralFields = true,
+									compositeLiteralTypes = true,
+									constantValues = true,
+									functionTypeParameters = true,
+									parameterNames = true,
+									rangeVariableTypes = true,
+								},
+							},
+						},
+					}
 				end,
 
 				-- legg til prismals, tsserver, osv. her om du trenger egne innstillinger

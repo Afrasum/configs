@@ -1,7 +1,7 @@
 theme = Rapture
 font-family = MesloLGS Nerd Font Mono
 font-size = 17
-background-opacity = 0.5
+background-opacity = 0.8
 background-blur = true
 
 macos-titlebar-style = tabs
@@ -26,9 +26,10 @@ shell-integration-features = cursor,sudo,title
 scrollback-limit = 134217728
 window-inherit-font-size = false
 
-keybind = cmd+left=text:\x02
+keybind = cmd+left=text:\x01
 keybind = cmd+right=text:\x05
 keybind = alt+left=esc:b
 keybind = alt+right=esc:f
 keybind = alt+backspace=text:\x1b\x7f
 keybind = cmd+backspace=text:\x15
+keybind = shift+enter=text:\x1b\r

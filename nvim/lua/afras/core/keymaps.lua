@@ -48,13 +48,13 @@ local opts = { noremap = true, silent = true }
 -- Normalmodus
 keymap.set("n", "d", '"_d', opts) -- d som vanlig delete-operator, men uten yanking
 keymap.set("n", "c", '"_c', opts) -- c som vanlig change-operator, men uten yanking
-keymap.set("n", "s", '"_s', opts) -- s (substitute) uten yanking
+-- keymap.set("n", "s", '"_s', opts) -- s (substitute) uten yanking -- COMMENTED OUT: Conflicts with nvim-surround
 keymap.set("n", "x", '"_x', opts) -- x (delete char) uten yanking
 
 -- Visuell modus
 keymap.set("v", "d", '"_d', opts)
 keymap.set("v", "c", '"_c', opts)
-keymap.set("v", "s", '"_s', opts)
+-- keymap.set("v", "s", '"_s', opts) -- COMMENTED OUT: Conflicts with nvim-surround (needs S in visual mode)
 keymap.set("v", "x", '"_x', opts)
 
 -- Insertmodus

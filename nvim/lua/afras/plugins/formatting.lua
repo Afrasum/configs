@@ -19,7 +19,21 @@ return {
         graphql = { "prettier" },
         liquid = { "prettier" },
         lua = { "stylua" },
-        python = { "isort", "black" },
+        python = { "ruff_format", "ruff_organize_imports" },
+        c = { "clang_format" },
+        cpp = { "clang_format" },
+        go = { "goimports", "gofumpt" },
+        rust = { "rustfmt" },
+      },
+      formatters = {
+        ruff_format = {
+          command = "uv",
+          args = { "tool", "run", "ruff", "format", "-" },
+        },
+        ruff_organize_imports = {
+          command = "uv",
+          args = { "tool", "run", "ruff", "check", "--select", "I", "--fix", "-" },
+        },
       },
       format_on_save = {
         lsp_fallback = true,

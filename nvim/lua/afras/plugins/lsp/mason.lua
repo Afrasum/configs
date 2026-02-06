@@ -38,6 +38,8 @@ return {
 				"prismals",
 				"pyright",
 				"rust_analyzer",
+				"clangd", -- C/C++ LSP
+				"gopls", -- Go LSP
 			},
 		})
 
@@ -45,11 +47,12 @@ return {
 			ensure_installed = {
 				"prettier", -- prettier formatter
 				"stylua", -- lua formatter
-				"isort", -- python formatter
-				"black", -- python formatter
-				"pylint", -- python linter
+				-- Python tools (ruff) are managed by uv, not Mason
 				"eslint_d", -- js linter
-				"rustfmt", -- rust formatter
+				-- rustfmt is installed via rustup, not Mason
+				"clang-format", -- C/C++ formatter
+				"gofumpt", -- Go formatter (stricter than gofmt)
+				"goimports", -- Go imports organizer
 			},
 		})
 	end,
