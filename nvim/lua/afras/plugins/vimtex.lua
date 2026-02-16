@@ -2,9 +2,6 @@ return {
 	"lervag/vimtex",
 	lazy = false, -- vimtex implements its own lazy loading via ftplugin
 	init = function()
-		-- Set localleader for vimtex commands
-		vim.g.maplocalleader = ";"
-
 		-- Use Skim as PDF viewer
 		vim.g.vimtex_view_method = "skim"
 

@@ -42,6 +42,10 @@ return {
 					local client_id = client.id
 					vim.lsp.stop_client(client_id, true)
 					vim.defer_fn(function()
+						-- Lagre først hvis det er endringer
+						if vim.bo.modified then
+							vim.cmd("write")
+						end
 						vim.cmd("edit")
 					end, 100)
 					restarted = true
@@ -67,10 +71,14 @@ return {
 			callback = function(ev)
 				local opts = { buffer = ev.buf, silent = true }
 
-				-- Enable inlay hints if supported (for type hints in Go, Rust, etc.)
 				local client = vim.lsp.get_client_by_id(ev.data.client_id)
-				if client and client.server_capabilities.inlayHintProvider then
-					vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+				if client then
+					if client.server_capabilities.inlayHintProvider then
+						vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+					end
+					if client.server_capabilities.semanticTokensProvider then
+						vim.lsp.semantic_tokens.start(ev.buf, client.id)
+					end
 				end
 
 				opts.desc = "Vis referanser"
@@ -188,19 +196,19 @@ return {
 				end,
 
 				["pyright"] = function()
-					-- Finn Python path først
+					-- Finn Python path - venv-selector setter VIRTUAL_ENV
 					local function get_python_path(workspace)
-						-- 1. Check if virtualenv is activated
+						-- 1. VIRTUAL_ENV satt av venv-selector eller manuell aktivering
 						if vim.env.VIRTUAL_ENV then
 							return vim.env.VIRTUAL_ENV .. "/bin/python"
 						end
 
-						-- 2. Check for .venv in workspace
+						-- 2. Fallback: sjekk for .venv i workspace
 						if vim.fn.executable(workspace .. "/.venv/bin/python") == 1 then
 							return workspace .. "/.venv/bin/python"
 						end
 
-						-- 3. Check for venv in workspace
+						-- 3. Fallback: sjekk for venv i workspace
 						if vim.fn.executable(workspace .. "/venv/bin/python") == 1 then
 							return workspace .. "/venv/bin/python"
 						end
@@ -210,10 +218,11 @@ return {
 
 					lspconfig.pyright.setup({
 						capabilities = capabilities,
-						on_new_config = function(new_config, new_root_dir)
-							local python_path = get_python_path(new_root_dir)
+						before_init = function(_, config)
+							-- Sett Python path før LSP starter
+							local python_path = get_python_path(config.root_dir)
 							if python_path then
-								new_config.settings.python.pythonPath = python_path
+								config.settings.python.pythonPath = python_path
 							end
 						end,
 						settings = {
@@ -253,7 +262,7 @@ return {
 				end,
 
 				["gopls"] = function()
-					return {
+					lspconfig.gopls.setup({
 						capabilities = capabilities,
 						settings = {
 							gopls = {
@@ -279,7 +288,7 @@ return {
 								},
 							},
 						},
-					}
+					})
 				end,
 
 				-- legg til prismals, tsserver, osv. her om du trenger egne innstillinger
