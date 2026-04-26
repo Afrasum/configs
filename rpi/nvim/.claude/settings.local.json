@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv --version)",
+      "Bash(uv tool list)",
+      "Bash(uv tool run pylint --from-stdin test.py -f json)",
+      "Read(//Users/afras/.local/share/nvim/mason/packages/**)",
+      "Read(//Users/afras/.local/share/nvim/mason/**)",
+      "WebSearch",
+      "WebFetch(domain:mason-registry.dev)",
+      "Bash(uv python list)",
+      "Bash(uv python pin --help)",
+      "Bash(cat /Users/afras/.config/nvim/.python-version)",
+      "Bash(uv python find)",
+      "Bash(cat /Users/afras/.local/share/nvim/mason/packages/pyright/package.json)",
+      "Bash(pyright --version)",
+      "Bash(nvim:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:ldez.github.io)",
+      "WebFetch(domain:gist.github.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
