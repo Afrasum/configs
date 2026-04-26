@@ -38,3 +38,6 @@ cache/
 raycast/config.json
 
 raycast/config.json
+
+# Claude Code local (machine-specific) settings
+**/.claude/settings.local.json
