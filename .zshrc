@@ -62,3 +62,4 @@ fpath=(/Users/afras/.docker/completions $fpath)
 ########## Misc ##########
 export STM32CubeMX_PATH=/Applications/STMicroelectronics/STM32CubeMX.app/Contents/Resources
 export PATH="$PATH:/Applications/microchip/xc8/v3.10/bin"
+eval "$(fnm env --use-on-cd)"

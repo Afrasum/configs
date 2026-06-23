@@ -24,6 +24,7 @@ return {
         cpp = { "clang_format" },
         go = { "goimports", "gofumpt" },
         rust = { "rustfmt" },
+        typst = { "typstyle" },
       },
       formatters = {
         ruff_format = {

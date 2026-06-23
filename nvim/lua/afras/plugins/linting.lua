@@ -11,6 +11,15 @@ return {
       typescriptreact = { "eslint_d" },
       svelte = { "eslint_d" },
       python = { "ruff" },
+      go = { "golangcilint" },
+    }
+
+    -- Configure golangci-lint for v2 (output flag renamed from v1)
+    lint.linters.golangcilint.args = {
+      "run",
+      "--fix=false",
+      "--show-stats=false",
+      "--output.json.path=stdout",
     }
 
     -- Configure ruff to use uv

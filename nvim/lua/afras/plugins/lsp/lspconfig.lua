@@ -16,8 +16,9 @@ return {
 		---------------------------------------------------------------------------
 		-- Importer nødvendige moduler
 		---------------------------------------------------------------------------
-		local lspconfig = require("lspconfig")
-		local mason_lspconfig = require("mason-lspconfig")
+		-- Sørg for at nvim-lspconfig er lastet slik at `lsp/<server>.lua`-configene
+		-- ligger på runtimepath og kan slås opp av vim.lsp.enable/vim.lsp.config.
+		require("lspconfig")
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 		local keymap = vim.keymap
 
@@ -128,170 +129,154 @@ return {
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 
 		---------------------------------------------------------------------------
-		-- mason-lspconfig v3 → bruk `handlers`-API
+		-- nvim 0.11 + mason-lspconfig v2: konfigurer servere via vim.lsp.config().
+		-- mason-lspconfig sin `automatic_enable` (på som standard) kaller
+		-- vim.lsp.enable() for hver installerte server, og leser config herfra.
+		-- Det gamle `handlers`-API-et finnes IKKE i v2 og kjøres aldri.
 		---------------------------------------------------------------------------
-		mason_lspconfig.setup({
-			-- automatic_installation = true | false kan settes her ved behov
-			handlers = {
-				-----------------------------------------------------------------------
-				-- Standardoppsett for alle servere
-				-----------------------------------------------------------------------
-				function(server_name)
-					lspconfig[server_name].setup({
-						capabilities = capabilities,
-					})
-				end,
 
-				-----------------------------------------------------------------------
-				-- Språkspesifikke overstyringer
-				-----------------------------------------------------------------------
-				["lua_ls"] = function()
-					lspconfig.lua_ls.setup({
-						capabilities = capabilities,
-						settings = {
-							Lua = {
-								diagnostics = { globals = { "vim" } },
-								completion = { callSnippet = "Replace" },
-							},
-						},
-					})
-				end,
+		-- Globale standardinnstillinger for ALLE servere (capabilities fra nvim-cmp)
+		vim.lsp.config("*", {
+			capabilities = capabilities,
+		})
 
-				["svelte"] = function()
-					lspconfig.svelte.setup({
-						capabilities = capabilities,
-						on_attach = function(client, _)
-							-- Hot-reload ved endring av JS/TS-filer
-							vim.api.nvim_create_autocmd("BufWritePost", {
-								pattern = { "*.js", "*.ts" },
-								callback = function(ctx)
-									client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-								end,
-							})
-						end,
-					})
-				end,
+		-----------------------------------------------------------------------
+		-- Språkspesifikke overstyringer (merges oppå "*" + nvim-lspconfig)
+		-----------------------------------------------------------------------
+		vim.lsp.config("lua_ls", {
+			settings = {
+				Lua = {
+					diagnostics = { globals = { "vim" } },
+					completion = { callSnippet = "Replace" },
+				},
+			},
+		})
 
-				["graphql"] = function()
-					lspconfig.graphql.setup({
-						capabilities = capabilities,
-						filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-					})
-				end,
+		vim.lsp.config("svelte", {
+			on_attach = function(client, _)
+				-- Hot-reload ved endring av JS/TS-filer
+				vim.api.nvim_create_autocmd("BufWritePost", {
+					pattern = { "*.js", "*.ts" },
+					callback = function(ctx)
+						client:notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
+					end,
+				})
+			end,
+		})
 
-				["emmet_ls"] = function()
-					lspconfig.emmet_ls.setup({
-						capabilities = capabilities,
-						filetypes = {
-							"html",
-							"typescriptreact",
-							"javascriptreact",
-							"css",
-							"sass",
-							"scss",
-							"less",
-							"svelte",
-						},
-					})
-				end,
+		vim.lsp.config("graphql", {
+			filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
+		})
 
-				["pyright"] = function()
-					-- Finn Python path - venv-selector setter VIRTUAL_ENV
-					local function get_python_path(workspace)
-						-- 1. VIRTUAL_ENV satt av venv-selector eller manuell aktivering
-						if vim.env.VIRTUAL_ENV then
-							return vim.env.VIRTUAL_ENV .. "/bin/python"
-						end
+		vim.lsp.config("emmet_ls", {
+			filetypes = {
+				"html",
+				"typescriptreact",
+				"javascriptreact",
+				"css",
+				"sass",
+				"scss",
+				"less",
+				"svelte",
+			},
+		})
 
-						-- 2. Fallback: sjekk for .venv i workspace
-						if vim.fn.executable(workspace .. "/.venv/bin/python") == 1 then
-							return workspace .. "/.venv/bin/python"
-						end
+		-- Finn Python path - venv-selector setter VIRTUAL_ENV
+		local function get_python_path(workspace)
+			-- 1. VIRTUAL_ENV satt av venv-selector eller manuell aktivering
+			if vim.env.VIRTUAL_ENV then
+				return vim.env.VIRTUAL_ENV .. "/bin/python"
+			end
 
-						-- 3. Fallback: sjekk for venv i workspace
-						if vim.fn.executable(workspace .. "/venv/bin/python") == 1 then
-							return workspace .. "/venv/bin/python"
-						end
+			-- 2. Fallback: sjekk for .venv i workspace
+			if workspace and vim.fn.executable(workspace .. "/.venv/bin/python") == 1 then
+				return workspace .. "/.venv/bin/python"
+			end
 
-						return nil
-					end
+			-- 3. Fallback: sjekk for venv i workspace
+			if workspace and vim.fn.executable(workspace .. "/venv/bin/python") == 1 then
+				return workspace .. "/venv/bin/python"
+			end
 
-					lspconfig.pyright.setup({
-						capabilities = capabilities,
-						before_init = function(_, config)
-							-- Sett Python path før LSP starter
-							local python_path = get_python_path(config.root_dir)
-							if python_path then
-								config.settings.python.pythonPath = python_path
-							end
-						end,
-						settings = {
-							python = {
-								analysis = {
-									autoSearchPaths = true,
-									useLibraryCodeForTypes = true,
-									diagnosticMode = "workspace",
-								},
-							},
-							-- Disable organize imports since Ruff handles it
-							pyright = {
-								disableOrganizeImports = true,
-							},
-						},
-					})
-				end,
+			return nil
+		end
 
-				["clangd"] = function()
-					lspconfig.clangd.setup({
-						capabilities = capabilities,
-						cmd = {
-							"clangd",
-							"--background-index",
-							"--clang-tidy",
-							"--header-insertion=iwyu",
-							"--completion-style=detailed",
-							"--function-arg-placeholders",
-							"--fallback-style=llvm",
-						},
-						init_options = {
-							usePlaceholders = true,
-							completeUnimported = true,
-							clangdFileStatus = true,
-						},
-					})
-				end,
+		vim.lsp.config("pyright", {
+			before_init = function(_, config)
+				-- Sett Python path før LSP starter
+				local python_path = get_python_path(config.root_dir)
+				if python_path then
+					config.settings = config.settings or {}
+					config.settings.python = config.settings.python or {}
+					config.settings.python.pythonPath = python_path
+				end
+			end,
+			settings = {
+				python = {
+					analysis = {
+						autoSearchPaths = true,
+						useLibraryCodeForTypes = true,
+						diagnosticMode = "workspace",
+					},
+				},
+				-- Disable organize imports since Ruff handles it
+				pyright = {
+					disableOrganizeImports = true,
+				},
+			},
+		})
 
-				["gopls"] = function()
-					lspconfig.gopls.setup({
-						capabilities = capabilities,
-						settings = {
-							gopls = {
-								analyses = {
-									unusedparams = true,
-									shadow = true,
-									nilness = true,
-									unusedwrite = true,
-									useany = true,
-								},
-								staticcheck = true,
-								gofumpt = true,
-								usePlaceholders = true,
-								completeUnimported = true,
-								hints = {
-									assignVariableTypes = true,
-									compositeLiteralFields = true,
-									compositeLiteralTypes = true,
-									constantValues = true,
-									functionTypeParameters = true,
-									parameterNames = true,
-									rangeVariableTypes = true,
-								},
-							},
-						},
-					})
-				end,
+		vim.lsp.config("clangd", {
+			cmd = {
+				"clangd",
+				"--background-index",
+				"--clang-tidy",
+				"--header-insertion=iwyu",
+				"--completion-style=detailed",
+				"--function-arg-placeholders",
+				"--fallback-style=llvm",
+			},
+			init_options = {
+				usePlaceholders = true,
+				completeUnimported = true,
+				clangdFileStatus = true,
+			},
+		})
 
-				-- legg til prismals, tsserver, osv. her om du trenger egne innstillinger
+		vim.lsp.config("gopls", {
+			settings = {
+				gopls = {
+					analyses = {
+						unusedparams = true,
+						shadow = true,
+						nilness = true,
+						unusedwrite = true,
+						useany = true,
+					},
+					staticcheck = true,
+					gofumpt = true,
+					usePlaceholders = true,
+					completeUnimported = true,
+					hints = {
+						assignVariableTypes = true,
+						compositeLiteralFields = true,
+						compositeLiteralTypes = true,
+						constantValues = true,
+						functionTypeParameters = true,
+						parameterNames = true,
+						rangeVariableTypes = true,
+					},
+				},
+			},
+		})
+
+		vim.lsp.config("tinymist", {
+			settings = {
+				-- Formatter via tinymist; conform bruker typstyle direkte
+				formatterMode = "typstyle",
+				-- Eksporter PDF ved lagring: "onSave" | "onType" | "never"
+				exportPdf = "onSave",
+				semanticTokens = "enable",
 			},
 		})
 	end,
