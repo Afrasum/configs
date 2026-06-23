@@ -1,0 +1,8 @@
+/nix/
+/System/
+/Library/
+/private/
+/usr/
+/Users/afras/Library/*
+/Users/afras/!/Library/CloudStorage/
+/Users/afras/**/*.photoslibrary/
