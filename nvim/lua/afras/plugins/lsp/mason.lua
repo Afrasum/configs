@@ -40,6 +40,7 @@ return {
 				"rust_analyzer",
 				"clangd", -- C/C++ LSP
 				"gopls", -- Go LSP
+				"tinymist", -- Typst LSP (erstatter deprecated typst-lsp)
 			},
 		})
 
@@ -53,6 +54,7 @@ return {
 				"clang-format", -- C/C++ formatter
 				"gofumpt", -- Go formatter (stricter than gofmt)
 				"goimports", -- Go imports organizer
+				"typstyle", -- Typst formatter
 			},
 		})
 	end,
