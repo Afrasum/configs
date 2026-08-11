@@ -1475,6 +1475,44 @@
                             },
                             {
                                 "from": {
+                                    "key_code": "period",
+                                    "modifiers": {
+                                        "mandatory": ["right_option", "shift"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    { "select_input_source": { "input_source_id": "com.apple.keylayout.UnicodeHexInput" } },
+                                    {
+                                        "hold_down_milliseconds": 50,
+                                        "key_code": "vk_none"
+                                    },
+                                    {
+                                        "key_code": "0",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "key_code": "3",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "key_code": "0",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "key_code": "8",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "hold_down_milliseconds": 50,
+                                        "key_code": "vk_none"
+                                    },
+                                    { "select_input_source": { "input_source_id": "com.apple.keylayout.US" } }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
                                     "key_code": "a",
                                     "modifiers": {
                                         "mandatory": ["right_option"],
@@ -2337,6 +2375,44 @@
                                     },
                                     {
                                         "key_code": "9",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "hold_down_milliseconds": 50,
+                                        "key_code": "vk_none"
+                                    },
+                                    { "select_input_source": { "input_source_id": "com.apple.keylayout.US" } }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "period",
+                                    "modifiers": {
+                                        "mandatory": ["right_option"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    { "select_input_source": { "input_source_id": "com.apple.keylayout.UnicodeHexInput" } },
+                                    {
+                                        "hold_down_milliseconds": 50,
+                                        "key_code": "vk_none"
+                                    },
+                                    {
+                                        "key_code": "0",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "key_code": "3",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "key_code": "0",
+                                        "modifiers": ["left_option"]
+                                    },
+                                    {
+                                        "key_code": "7",
                                         "modifiers": ["left_option"]
                                     },
                                     {
