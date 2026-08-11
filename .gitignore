@@ -35,9 +35,10 @@ nvim/session.vim
 
 # Ignore any other cache directories
 cache/
+# Raycast: config.json holds local state; extensions/ is compiled output that
+# Raycast regenerates on every install/update. Only raycast/scripts/ is ours.
 raycast/config.json
-
-raycast/config.json
+raycast/extensions/
 
 # Claude Code local (machine-specific) settings
 **/.claude/settings.local.json
