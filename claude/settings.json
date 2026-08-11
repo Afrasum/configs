@@ -10,6 +10,12 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "refreshInterval": 10
+  },
   "hooks": {
     "Notification": [
       {
@@ -39,10 +45,11 @@
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
+  "advisorModel": "opus",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "verbose": true,
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "tui": "fullscreen"
+  "skipAutoPermissionPrompt": true
 }
