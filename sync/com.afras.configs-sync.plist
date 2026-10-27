@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.afras.configs-sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/afras/Projects/configs/sync/sync.sh</string>
+    </array>
+
+    <!-- Sundays 20:00; runs on wake if the Mac was asleep -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>0</integer>
+        <key>Hour</key>
+        <integer>20</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/afras/.local/state/configs-sync/launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/afras/.local/state/configs-sync/launchd.log</string>
+</dict>
+</plist>
