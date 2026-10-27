@@ -57,29 +57,33 @@ if [[ "${1:-}" == --check ]]; then
   exit 0
 fi
 
-{
-  print "=== $(date '+%F %T')"
-  if (( ${#changes} == 0 )); then
-    print "no changes"
-    exit 0
-  fi
-  print -l "${changes[@]}"
-} >>"$LOG"
+push() {
+  [[ -z "$(git -C "$REPO" log --oneline @{u}.. 2>/dev/null)" ]] && return 0
+  git -C "$REPO" push -q >>"$LOG" 2>&1 || { notify "Configs-sync" "git push feilet, se $LOG"; return 1; }
+  print "pushed" >>"$LOG"
+}
 
-summary=$(cd "$REPO" && claude -p --model sonnet \
-  --permission-mode acceptEdits \
-  --allowedTools "Read" "Edit" "Write" "Bash(cp:*)" "Bash(diff:*)" "Bash(cmp:*)" "Bash(jq:*)" "Bash(git:*)" "Bash(ls:*)" "Bash(cat:*)" "Bash(mkdir:*)" \
-  "$(cat "$REPO/sync/prompt.md")
+print "=== $(date '+%F %T')" >>"$LOG"
+if (( ${#changes} == 0 )); then
+  print "no changes" >>"$LOG"
+  push
+  exit
+fi
+print -l "${changes[@]}" >>"$LOG"
 
-Endringer funnet av forhåndssjekken:
-$(print -l "${changes[@]}")" 2>>"$LOG")
-status=$?
+# prompt goes on stdin: --allowedTools is variadic and would swallow it
+summary=$({ cat "$REPO/sync/prompt.md"; print "\nEndringer funnet av forhåndssjekken:"; print -l "${changes[@]}"; } |
+  (cd "$REPO" && claude -p --model sonnet \
+    --permission-mode acceptEdits \
+    --allowedTools "Read,Edit,Write,Bash(cp:*),Bash(diff:*),Bash(cmp:*),Bash(jq:*),Bash(git:*),Bash(ls:*),Bash(cat:*),Bash(mkdir:*)") 2>>"$LOG")
+rc=$?
 print "$summary" >>"$LOG"
 
-if (( status != 0 )); then
+if (( rc != 0 )); then
   notify "Configs-sync feilet" "Se $LOG"
   exit 1
 fi
 
 print "$kb_hash" >"$STATE/karabiner.sha"
+push || exit 1
 notify "Configs-sync" "$(print "$summary" | grep '^SUMMARY:' | tail -1 | sed 's/^SUMMARY: *//')"

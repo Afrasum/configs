@@ -14,7 +14,8 @@ Regler:
 - karabiner.json: IKKE kopier blindt. Repoet beholder bevisst regelen "Caps Lock vim-layer med visual mode" som macen mangler, og regelen "test lambda" skal ikke med. Sammenlign regel for regel med jq og overfør bare reelle endringer (nye/endrede regler, endringer utenfor complex_modifications), og bevar vim-layer.
 - Ikke endre noe på macen, bare i repoet.
 - Commit i logiske biter (én per verktøy/endring), conventional-commit-stil som i `git log` (f.eks. `feat(nvim): ...`). Ingen Co-Authored-By-linjer.
-- `git push` til slutt. Hvis det viser seg at ingenting reelt skal kopieres, ikke commit.
+- Ikke push, det gjør skriptet etterpå. Hvis det viser seg at ingenting reelt skal kopieres, ikke commit.
+- Hvis arbeidstreet har ucommittede endringer som ikke kommer fra macen, la dem være og nevn det i oppsummeringen.
 
 Siste linje i svaret ditt MÅ være én linje på formen:
 SUMMARY: <kort norsk oppsummering, maks ~120 tegn, f.eks. "3 commits pushet: zsh-alias, ghostty auto-update, nvim typst">
