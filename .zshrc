@@ -46,6 +46,7 @@ alias cd="z"
 ########## Aliases ##########
 alias c='clear'
 alias cl='claude'
+alias co='codex'
 alias lg='lazygit'
 alias venv='source .venv/bin/activate'
 
