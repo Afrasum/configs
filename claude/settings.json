@@ -6,16 +6,12 @@
       "WebFetch(domain:elevenlabs.io)",
       "WebFetch(domain:pypi.org)",
       "WebFetch(domain:github.com)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(cat \"/Users/afras/Library/Application Support/Google/Chrome/DevToolsActivePort\")"
     ],
     "defaultMode": "auto"
   },
-  "model": "opus",
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh",
-    "refreshInterval": 10
-  },
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -38,11 +34,18 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "refreshInterval": 10
+  },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "browser-use@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {},
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "advisorModel": "opus",
