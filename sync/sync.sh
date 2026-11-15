@@ -71,8 +71,21 @@ if (( ${#changes} == 0 )); then
 fi
 print -l "${changes[@]}" >>"$LOG"
 
+# Claude Code treats dotfiles like .zshrc/.gitconfig as sensitive and refuses
+# to write them even via cp in -p mode, so single files are copied here.
+# Claude then reviews the uncommitted diff (reverting anything secret) and commits.
+precopied=()
+for live dest in "${pairs[@]}"; do
+  [[ -f "$live" ]] || continue
+  cmp -s "$REPO/$dest" "$live" && continue
+  mkdir -p "$REPO/${dest:h}" && cp "$live" "$REPO/$dest" && precopied+=("$dest")
+done
+(( ${#precopied} )) && print "precopied: ${precopied[*]}" >>"$LOG"
+
 # prompt goes on stdin: --allowedTools is variadic and would swallow it
-summary=$({ cat "$REPO/sync/prompt.md"; print "\nEndringer funnet av forhåndssjekken:"; print -l "${changes[@]}"; } |
+summary=$({ cat "$REPO/sync/prompt.md"
+            print "\nEndringer funnet av forhåndssjekken:"; print -l "${changes[@]}"
+            print "\nAllerede kopiert av skriptet (ligger ucommittet i arbeidstreet):"; print -l "${precopied[@]:-ingen}"; } |
   (cd "$REPO" && claude -p --model sonnet \
     --permission-mode acceptEdits \
     --allowedTools "Read,Edit,Write,Bash(cp:*),Bash(diff:*),Bash(cmp:*),Bash(jq:*),Bash(git:*),Bash(ls:*),Bash(cat:*),Bash(mkdir:*)") 2>>"$LOG")

@@ -12,6 +12,7 @@ Regler:
 - Aldri kopier hemmeligheter: `gh/hosts.yml`, tokens, API-nøkler, `.env`. Hvis en fil inneholder noe som ser ut som en hemmelighet, hopp over den og nevn det.
 - Hopp over støy: `*.bak`, `*.log`, `automatic_backups/`, `karabiner/assets/`, `nvim/.claude/`, lockfiler som bare er rot.
 - karabiner.json: IKKE kopier blindt. Repoet beholder bevisst regelen "Caps Lock vim-layer med visual mode" som macen mangler, og regelen "test lambda" skal ikke med. Sammenlign regel for regel med jq og overfør bare reelle endringer (nye/endrede regler, endringer utenfor complex_modifications), og bevar vim-layer.
+- Enkeltfiler (dotfiler, claude/-filene osv.) er allerede kopiert inn av skriptet fordi Claude Code ikke får skrive til dotfiler som `.zshrc`. Ikke prøv å kopiere dem på nytt. Se over `git diff` for dem: commit hvis alt er greit. Hvis en av dem inneholder en hemmelighet, kjør `git checkout -- <fil>` og nevn det. Mapper (nvim, git, fd, raycast/scripts osv.) og karabiner.json må du fortsatt ta selv.
 - Ikke endre noe på macen, bare i repoet.
 - Commit i logiske biter (én per verktøy/endring), conventional-commit-stil som i `git log` (f.eks. `feat(nvim): ...`). Ingen Co-Authored-By-linjer.
 - Ikke push, det gjør skriptet etterpå. Hvis det viser seg at ingenting reelt skal kopieres, ikke commit.
