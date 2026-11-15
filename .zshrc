@@ -49,6 +49,8 @@ alias cl='claude'
 alias co='codex'
 alias lg='lazygit'
 alias venv='source .venv/bin/activate'
+alias pc='pwd | pbcopy'
+alias n='nvim'
 
 ########## Azure CLI completions ##########
 autoload bashcompinit && bashcompinit
